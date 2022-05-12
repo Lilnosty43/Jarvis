@@ -1,5 +1,4 @@
 import json
-import os
 import urllib.error
 import urllib.request
 from threading import Thread
@@ -18,6 +17,7 @@ from modules.utils import shared, support
 
 env = models.env
 fileio = models.fileio
+indicators = models.indicators
 
 
 def car(phrase: str) -> None:
@@ -58,21 +58,21 @@ def car(phrase: str) -> None:
         extras += f"I've configured the climate setting to {target_temp}°F"
 
         if not shared.called_by_offline:
-            playsound(sound=f"indicators{os.path.sep}exhaust.mp3", block=False)
+            playsound(sound=indicators.exhaust, block=False)
         if car_name := vehicle(operation="START", temp=target_temp - 26):
             speaker.speak(text=f"Your {car_name} has been started {env.title}. {extras}")
         else:
             speaker.speak(text=disconnected)
     elif "turn off" in phrase or "stop" in phrase:
         if not shared.called_by_offline:
-            playsound(sound=f"indicators{os.path.sep}exhaust.mp3", block=False)
+            playsound(sound=indicators.exhaust, block=False)
         if car_name := vehicle(operation="STOP"):
             speaker.speak(text=f"Your {car_name} has been turned off {env.title}!")
         else:
             speaker.speak(text=disconnected)
     elif "secure" in phrase:
         if not shared.called_by_offline:
-            playsound(sound=f"indicators{os.path.sep}exhaust.mp3", block=False)
+            playsound(sound=indicators.exhaust, block=False)
         if car_name := vehicle(operation="SECURE"):
             speaker.speak(text=f"Guardian mode has been enabled {env.title}! Your {car_name} is now secure.")
         else:
@@ -81,28 +81,28 @@ def car(phrase: str) -> None:
         if shared.called_by_offline:
             speaker.speak(text="Cannot unlock the car via offline communicator due to security reasons.")
             return
-        playsound(sound=f"indicators{os.path.sep}exhaust.mp3", block=False)
+        playsound(sound=indicators.exhaust, block=False)
         if car_name := vehicle(operation="UNLOCK"):
             speaker.speak(text=f"Your {car_name} has been unlocked {env.title}!")
         else:
             speaker.speak(text=disconnected)
     elif "lock" in phrase:
         if not shared.called_by_offline:
-            playsound(sound=f"indicators{os.path.sep}exhaust.mp3", block=False)
+            playsound(sound=indicators.exhaust, block=False)
         if car_name := vehicle(operation="LOCK"):
             speaker.speak(text=f"Your {car_name} has been locked {env.title}!")
         else:
             speaker.speak(text=disconnected)
     elif "honk" in phrase or "blink" in phrase or "horn" in phrase:
         if not shared.called_by_offline:
-            playsound(sound=f"indicators{os.path.sep}exhaust.mp3", block=False)
+            playsound(sound=indicators.exhaust, block=False)
         if car_name := vehicle(operation="HONK"):
             speaker.speak(text=f"I've made your {car_name} honk and blink {env.title}!")
         else:
             speaker.speak(text=disconnected)
     elif "locate" in phrase or "where" in phrase:
         if not shared.called_by_offline:
-            playsound(sound=f"indicators{os.path.sep}exhaust.mp3", block=False)
+            playsound(sound=indicators.exhaust, block=False)
         if location := vehicle(operation="LOCATE"):
             speaker.speak(text=location)
         else:

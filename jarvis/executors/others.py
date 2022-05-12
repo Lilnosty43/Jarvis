@@ -34,6 +34,7 @@ from modules.utils import shared, support
 
 env = models.env
 fileio = models.fileio
+indicators = models.indicators
 db = database.Database(database=fileio.base_db)
 
 
@@ -216,7 +217,7 @@ def jokes() -> NoReturn:
 
 def flip_a_coin() -> NoReturn:
     """Says ``heads`` or ``tails`` from a random choice."""
-    playsound(f'indicators{os.path.sep}coin.mp3') if not shared.called_by_offline else None
+    playsound(indicators.coin) if not shared.called_by_offline else None
     speaker.speak(
         text=f"""{random.choice(['You got', 'It landed on', "It's"])} {random.choice(['heads', 'tails'])} {env.title}"""
     )

@@ -46,6 +46,7 @@ def speech_synthesizer(text: str, timeout: int = env.speech_synthesis_timeout) -
                                  data=text, verify=False, timeout=timeout)
         logger.error(f"{response.status_code}::http://localhost:5002/api/tts")
         if not response.ok:
+            env.speech_synthesis_timeout = 0
             return False
         with open(file=fileio.speech_synthesis_wav, mode="wb") as file:
             file.write(response.content)
@@ -54,6 +55,7 @@ def speech_synthesizer(text: str, timeout: int = env.speech_synthesis_timeout) -
             requests.exceptions.Timeout) as error:
         # Timeout exception covers both connection timeout and read timeout
         logger.error(error)
+        env.speech_synthesis_timeout = 0
 
 
 def speak(text: str = None, run: bool = False, block: bool = True) -> NoReturn:

@@ -245,6 +245,6 @@ def starter() -> NoReturn:
     voices.voice_default()
     clear_logs()
     # Used only during restart
-    for file in os.listdir("fileio"):
-        os.chmod(f"fileio{os.path.sep}{file}", os.stat(f"fileio{os.path.sep}{file}").st_mode | stat.S_IEXEC)
+    for file in os.listdir(fileio.base_path):
+        os.chmod(f"{fileio.base_path}{file}", os.stat(f"{fileio.base_path}{file}").st_mode | stat.S_IEXEC)
     # [os.chmod(file, int('755', base=8) or 0o755) for file in os.listdir("fileio")]

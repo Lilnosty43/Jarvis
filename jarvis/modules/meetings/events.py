@@ -1,8 +1,9 @@
 import os
 import re
+import sqlite3
 import subprocess
 from datetime import datetime
-from multiprocessing import Process
+from multiprocessing import Process, current_process
 from multiprocessing.context import TimeoutError as ThreadTimeoutError
 from multiprocessing.pool import ThreadPool
 from typing import NoReturn
@@ -25,10 +26,20 @@ def events_writer() -> NoReturn:
     This function runs in a dedicated process to avoid wait time when events information is requested.
     """
     event_info = events_gatherer()
-    with db.connection:
-        cursor = db.connection.cursor()
-        cursor.execute(f"INSERT OR REPLACE INTO {env.event_app} (info) VALUES (?);", (event_info,))
-        cursor.connection.commit()
+    try:
+        with db.connection:
+            cursor = db.connection.cursor()
+            cursor.execute(f"INSERT OR REPLACE INTO {env.event_app} (info) VALUES (?);", (event_info,))
+            cursor.connection.commit()
+    except sqlite3.OperationalError as error:
+        if current_process().name == "MainProcess":
+            raise sqlite3.OperationalError(error)
+        if not os.path.isfile(fileio.base_db):
+            logger.warning(f"{fileio.base_db} was removed.")
+        elif str(error) == "attempt to write a readonly database":
+            logger.error(error)
+        else:
+            raise sqlite3.OperationalError(error)
 
 
 def event_app_launcher() -> NoReturn:
@@ -57,7 +68,7 @@ def events_gatherer() -> str:
     process = subprocess.Popen(["/usr/bin/osascript", fileio.event_script] + [str(arg) for arg in [1, 3]],
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = process.communicate()
-    os.system(f"git checkout -- {fileio.event_script}")  # Undo the unspecified changes done by ScriptEditor
+    os.system(f"git checkout -- {fileio.event_script} > /dev/null 2>&1")  # Undo run-time changes made by ScriptEditor
     if error := process.returncode:  # stores non zero error
         err_msg = err.decode("UTF-8")
         err_code = err_msg.split()[-1].strip()

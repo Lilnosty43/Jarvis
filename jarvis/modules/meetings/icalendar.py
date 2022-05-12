@@ -1,5 +1,7 @@
+import sqlite3
 import time
-from multiprocessing import Process
+import os
+from multiprocessing import Process, current_process
 from multiprocessing.context import TimeoutError as ThreadTimeoutError
 from multiprocessing.pool import ThreadPool
 from typing import NoReturn
@@ -25,10 +27,20 @@ def meetings_writer() -> NoReturn:
     This function runs in a dedicated process every hour to avoid wait time when meetings information is requested.
     """
     meeting_info = meetings_gatherer()
-    with db.connection:
-        cursor = db.connection.cursor()
-        cursor.execute("INSERT OR REPLACE INTO ics (info) VALUES (?);", (meeting_info,))
-        cursor.connection.commit()
+    try:
+        with db.connection:
+            cursor = db.connection.cursor()
+            cursor.execute("INSERT OR REPLACE INTO ics (info) VALUES (?);", (meeting_info,))
+            cursor.connection.commit()
+    except sqlite3.OperationalError as error:
+        if current_process().name == "MainProcess":
+            raise sqlite3.OperationalError(error)
+        if not os.path.isfile(fileio.base_db):
+            logger.warning(f"{fileio.base_db} was removed.")
+        elif str(error) == "attempt to write a readonly database":
+            logger.error(error)
+        else:
+            raise sqlite3.OperationalError(error)
 
 
 def meetings_gatherer() -> str:

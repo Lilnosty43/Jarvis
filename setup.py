@@ -50,15 +50,15 @@ def dependencies() -> list:
         list:
         List of dependencies to be installed.
     """
-    requirement_file = os.path.dirname(os.path.realpath(__file__)) + f'{os.path.sep}lib{os.path.sep}requirements.txt'
+    requirement_file = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                    f'jarvis{os.path.sep}lib{os.path.sep}requirements.txt')
     if os.path.isfile(requirement_file):
         with open(requirement_file) as requirements:
-            install_requires = requirements.read().splitlines()
-    return install_requires
+            return requirements.read().splitlines()
 
 
 setup(
-    name='jarvis-ironman',
+    name='jarvis-ui',
     version='.'.join(str(c) for c in version_info),
     description="IronMan's Jarvis with python.",
     long_description=read('README.md') + '\n\n' + read('CHANGELOG'),
@@ -69,6 +69,7 @@ setup(
     url=base_url,
     python_requires=">=3.8",
     install_requires=dependencies(),
+    include_package_data=True,
     classifiers=classifiers,
     keywords='python, natural-language-processing, text-to-speech, speech-recognition, jarvis, hotword-detection,'
              'virtual-assistant, multiprocessing, threadpool',

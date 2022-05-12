@@ -10,15 +10,14 @@ import os.path
 import platform
 import socket
 from datetime import datetime
-
+import inspect
 from pydantic import (BaseModel, BaseSettings, DirectoryPath, EmailStr, Field,
                       FilePath, HttpUrl, PositiveInt)
 
 from modules.exceptions import InvalidEnvVars, UnsupportedOS
 
-# Used by docs
-if not os.path.isdir('fileio'):
-    os.makedirs(name='fileio')
+current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+source_dir = os.path.dirname(os.path.dirname(current_dir)) + os.path.sep
 
 
 class EnvConfig(BaseSettings):
@@ -121,19 +120,43 @@ class FileIO(BaseModel):
 
     """
 
-    automation: FilePath = f'fileio{os.path.sep}automation.yaml'
-    tmp_automation: FilePath = f'fileio{os.path.sep}tmp_automation.yaml'
-    base_db: FilePath = f'fileio{os.path.sep}database.db'
-    task_db: FilePath = f'fileio{os.path.sep}tasks.db'
-    frequent: FilePath = f'fileio{os.path.sep}frequent.yaml'
-    location: FilePath = f'fileio{os.path.sep}location.yaml'
-    notes: FilePath = f'fileio{os.path.sep}notes.txt'
-    smart_devices: FilePath = f'fileio{os.path.sep}smart_devices.yaml'
-    hostnames: FilePath = f'fileio{os.path.sep}hostnames.yaml'
-    training: FilePath = f'fileio{os.path.sep}training_data.yaml'
-    event_script: FilePath = f'fileio{os.path.sep}{env.event_app}.scpt'
-    speech_synthesis_wav: FilePath = f'fileio{os.path.sep}speech_synthesis.wav'
+    base_path: DirectoryPath = f'{source_dir}fileio{os.path.sep}'
+
+    automation: FilePath = f'{source_dir}fileio{os.path.sep}automation.yaml'
+    tmp_automation: FilePath = f'{source_dir}fileio{os.path.sep}tmp_automation.yaml'
+    base_db: FilePath = f'{source_dir}fileio{os.path.sep}database.db'
+    task_db: FilePath = f'{source_dir}fileio{os.path.sep}tasks.db'
+    frequent: FilePath = f'{source_dir}fileio{os.path.sep}frequent.yaml'
+    location: FilePath = f'{source_dir}fileio{os.path.sep}location.yaml'
+    notes: FilePath = f'{source_dir}fileio{os.path.sep}notes.txt'
+    smart_devices: FilePath = f'{source_dir}fileio{os.path.sep}smart_devices.yaml'
+    hostnames: FilePath = f'{source_dir}fileio{os.path.sep}hostnames.yaml'
+    training: FilePath = f'{source_dir}fileio{os.path.sep}training_data.yaml'
+    event_script: FilePath = f'{source_dir}fileio{os.path.sep}{env.event_app}.scpt'
+    robinhood: FilePath = f'{source_dir}fileio{os.path.sep}robinhood.html'
+    speech_synthesis_wav: FilePath = f'{source_dir}fileio{os.path.sep}speech_synthesis.wav'
     speech_synthesis_log: FilePath = datetime.now().strftime(f'logs{os.path.sep}speech_synthesis_%d-%m-%Y.log')
 
 
+class Indicators(BaseModel):
+    """Loads the file path of all indicators
+
+    >>> Indicators
+
+    """
+
+    base_path: DirectoryPath = f'{source_dir}indicators{os.path.sep}'
+
+    ack: DirectoryPath = f'{source_dir}indicators{os.path.sep}acknowledgement.mp3'
+    alarm: DirectoryPath = f'{source_dir}indicators{os.path.sep}alarm.mp3'
+    coin: DirectoryPath = f'{source_dir}indicators{os.path.sep}coin.mp3'
+    end: DirectoryPath = f'{source_dir}indicators{os.path.sep}end.mp3'
+    exhaust: DirectoryPath = f'{source_dir}indicators{os.path.sep}exhaust.mp3'
+    init: DirectoryPath = f'{source_dir}indicators{os.path.sep}initialize.mp3'
+    start: DirectoryPath = f'{source_dir}indicators{os.path.sep}start.mp3'
+    tv_conn: DirectoryPath = f'{source_dir}indicators{os.path.sep}tv_connect.mp3'
+    tv_scan: DirectoryPath = f'{source_dir}indicators{os.path.sep}tv_scan.mp3'
+
+
 fileio = FileIO()
+indicators = Indicators()

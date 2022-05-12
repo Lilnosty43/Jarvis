@@ -6,25 +6,25 @@ import math
 import os
 import sys
 import time
-import warnings
 from datetime import datetime
 
 import jinja2
 import requests
 from pyrh import Robinhood
+from executors.logger import logger
 
 current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parent_dir = os.path.dirname(current_dir)
 if parent_dir != os.getcwd():
-    warnings.warn('Parent directory does not match the current working directory.\n'
-                  f'Parent: {parent_dir}\n'
-                  f'CWD: {os.getcwd()}')
+    logger.warning("Jarvis is being run as a module. This is a beta feature.")  # TODO: Remove when merged to master
+    logger.warning(f"Parent directory {parent_dir} does not match the current working directory {os.getcwd()}")
 sys.path.insert(0, parent_dir)
 
 from api.rh_helper import CustomTemplate  # noqa
 from modules.models import config, models  # noqa
 
 env = models.env
+fileio = models.fileio
 
 
 class Investment:
@@ -179,7 +179,7 @@ class Investment:
         template = CustomTemplate.source.strip()
         rendered = jinja2.Template(template).render(TITLE=title, SUMMARY=web_text, PROFIT=profit_web, LOSS=loss_web,
                                                     WATCHLIST_UP=s2, WATCHLIST_DOWN=s1)
-        with open('api/robinhood.html', 'w') as static_file:
+        with open(fileio.robinhood, 'w') as static_file:
             static_file.write(rendered)
 
         self.logger.info(f'Static file generated in {round(float(time.perf_counter()), 2)}s')

@@ -1,0 +1,12 @@
+recursive-include jarvis *
+recursive-exclude jarvis/api *.html
+recursive-exclude jarvis/logs *
+recursive-exclude jarvis/fileio *.db
+recursive-exclude jarvis/fileio *.html
+recursive-exclude jarvis/fileio *.yaml
+recursive-exclude jarvis/fileio *.txt
+recursive-exclude jarvis .env
+recursive-exclude venv *
+recursive-exclude docs *
+recursive-exclude doc_generator *
+exclude gen_docs.sh .gitignore .pre-commit-config.yaml

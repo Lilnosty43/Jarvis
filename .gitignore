@@ -6,28 +6,33 @@ venv
 
 # WIP: Dockerfile and it's requirements file
 Dockerfile
-lib/docker_requirements.txt
+docker_requirements.txt
 
 # WIP: Contacts to call or message
 contacts.yml
 
 # File IO operations
-fileio/*.yaml
-fileio/*.db
-fileio/*.txt
+hostnames.yaml
+location.yaml
+smart_devices.yaml
+training_data.yaml
+database.db
+tasks.db
+notes.txt
+robinhood.html
 
 # Log files
-logs
+logs/
 
 # training directory with images of faces for recognition
-train
+train/
 
 # Storage for images of intruders
-threat
+threat/
 
 # .keep files for Alarms and Reminders
-alarm
-reminder
+alarm/
+reminder/
 
 # sphinx docs builder within doc_generator
 _build
@@ -38,9 +43,6 @@ _static
 
 # volume exec file for Windows
 SetVol.exe
-
-# robinhood report file generated to be accessed from API endpoint
-api/robinhood.html
 
 # temporary file that indicates that jarvis should restart
 pyicloud_error

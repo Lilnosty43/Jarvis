@@ -10,6 +10,10 @@ from pywebostv.controls import (ApplicationControl, MediaControl,
                                 SourceControl, SystemControl)
 
 from executors.logger import logger
+from modules.models import models
+
+fileio = models.fileio
+indicators = models.indicators
 
 
 class TV:
@@ -37,29 +41,28 @@ class TV:
         try:
             self.client = WebOSClient(ip_address)
             self.client.connect()
-        except (gaierror, ConnectionRefusedError, ConnectionResetError):  # when IP or client key is None or incorrect
+        except (gaierror, ConnectionRefusedError, ConnectionResetError) as error:
+            playsound(sound=indicators.tv_scan, block=False)
+            logger.error(error)
             self.reconnect = True
-            playsound(sound=f'indicators{os.path.sep}tv_scan.mp3', block=False)
-            scan_msg = "The TV's IP has either changed or unreachable. Scanning your IP range."
-            sys.stdout.write(f"\r{scan_msg}")
-            logger.error(scan_msg)
             self.client = WebOSClient.discover()[0]
             self.client.connect()
-        except (TimeoutError, BrokenPipeError):
-            logger.error('Operation timed out. The TV might be turned off.')
+            print(self.client.connection)
+        except (TimeoutError, BrokenPipeError) as error:
+            logger.error(error)
 
         for status in self.client.register(store):
             if status == WebOSClient.REGISTERED and not self._init_status:
                 sys.stdout.write('\rConnected to the TV.')
             elif status == WebOSClient.PROMPTED:
-                playsound(sound=f'indicators{os.path.sep}tv_connect.mp3', block=False)
+                playsound(sound=indicators.tv_conn, block=False)
                 self.reconnect = True
                 sys.stdout.write('\rPlease accept the connection request on your TV.')
 
         if self.reconnect:
             self.reconnect = False
             if os.path.isfile('.env'):
-                set_key(dotenv_path='.env', key_to_set='tv_client_key', value_to_set=store.get('client_key'))
+                set_key(dotenv_path='.env', key_to_set='TV_CLIENT_KEY', value_to_set=store.get('client_key'))
             else:
                 logger.critical('Client key has been generated. Store it in env vars to re-use.')
                 logger.critical(f"TV_CLIENT_KEY: {store.get('client_key')}")
